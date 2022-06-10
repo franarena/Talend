@@ -1,4 +1,4 @@
-namespace TalendMigration.Core.BussinessLayer;
+namespace TalendMigration.Core.BusinessLayer;
 
 public interface IMigration
 {
