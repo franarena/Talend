@@ -28,9 +28,13 @@ public class CiscoDAL : IMigrationDAL
                     };
                     using (var csv = new CsvReader(reader, csvConfig))
                     {
-                        var headerRow = csv.Context.Reader.HeaderRecord;
+                        csv.Read();
+                        csv.ReadHeader();
+                        var headers = csv.Parser.RawRecord ?? string.Empty;
+                        var headerRow = headers.Split(',');
                         while (csv.Read())
                         {
+                            //var headerRow = csv.Context.Reader.HeaderRecord;
                             var invoice = Activator.CreateInstance<T>();
                             invoice.ReadFromCsvReader(csv, headerRow);
                             invoices.Add(invoice);

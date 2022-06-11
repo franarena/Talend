@@ -6,7 +6,6 @@ using TalendMigration.Core.Models;
 namespace TalendMigration.Core.BusinessLayer;
 public class CiscoMigration : Migration
 {
-    public string MigrationFile { get; set; } = string.Empty;
     public Char ColumnSeparator { get; set; }
 
     public CiscoMigration(IMigrationDAL dal) : base(dal)

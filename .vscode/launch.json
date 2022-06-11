@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/Migration.Console/bin/Debug/net6.0/Migration.Console.dll",
-            "args": ["csv_for_json_nodup.csv"],
+            "args": ["/home/francisco/Documents/csv_for_json_nodup.csv"],
             "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
+            "console": "integratedTerminal",
             "stopAtEntry": false
         },
         {
