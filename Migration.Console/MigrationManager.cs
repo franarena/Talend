@@ -41,11 +41,11 @@ internal sealed class MigrationManager
         Subscriptions = new List<DTOSubscription>();
         if (IsCisco){
             dal = new CiscoDAL();
-            migration = new CiscoMigration(dal);
+            migration = new CiscoMigration(dal) { ColumnSeparator = ','};
             Subscriptions = migration.GetSubscriptions<InvoiceCisco>(FileName);
         } else if (IsSonicWall){
             dal = new SonicWallDAL();
-            migration = new SonicWallMigration(dal);
+            migration = new SonicWallMigration(dal) { ColumnSeparator = ','};
             Subscriptions = migration.GetSubscriptions<Invoice>(FileName);
         }
         return migration.SaveSubscriptions(Subscriptions);
