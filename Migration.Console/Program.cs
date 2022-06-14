@@ -1,16 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("Hello, World!");
-var fileName = args[0];
-var dal = new CiscoDAL();
-//var currentDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            //Directory.GetCurrentDirectory();
-var migration = new CiscoMigration(dal) { ColumnSeparator = ',', MigrationFile = fileName };
 
-Console.WriteLine($"{fileName}");
+var manager = Migration.Console.MigrationManager.Create(args);
 
-var subs = migration.GetSubscriptions();
+Console.WriteLine($"\nFile to process --> {manager.FileName}");
+manager.Execute();
 
-if (subs.Any())
-    migration.SaveSubscriptions(subs);
+Console.WriteLine($"{manager.Subscriptions.Count()} subscription(s) found in {System.IO.Path.GetFileName(manager.FileName)}");
+Console.WriteLine("File json saved successfully");
 
-Console.WriteLine($"Program ending! {subs.Count()} subscription(s)");
+Console.WriteLine("\nProgram ending");
