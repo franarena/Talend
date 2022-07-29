@@ -22,12 +22,14 @@ public abstract class Migration : IMigration
         fileName = Path.Combine(Path.GetDirectoryName(MigrationFile) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(MigrationFile)}.json");
         if (File.Exists(fileName))
             File.Delete(fileName);
+
+        var subsCollection = new SubscriptionsCollection<DTO.DTOSubscription>(subscriptions);
         using (var file = File.CreateText(fileName))
         {
             //JsonSerializer serializer = new JsonSerializer();
             var serializer = JsonSerializer.Create(new JsonSerializerSettings() { Formatting = Formatting.Indented });
             // serialize JSON directly to a file
-            serializer.Serialize(file, subscriptions);
+            serializer.Serialize(file, subsCollection);
         }
         return true;
     }

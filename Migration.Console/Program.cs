@@ -1,16 +1,33 @@
-﻿// See https://aka.ms/new-console-template for more information
-//Console.WriteLine("Hello, World!");
-var fileName = args[0];
-var dal = new CiscoDAL();
-//var currentDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            //Directory.GetCurrentDirectory();
-var migration = new CiscoMigration(dal) { ColumnSeparator = ',', MigrationFile = fileName };
+﻿using Microsoft.Extensions.Logging.Console;
+using TalendMigration.Core.BusinessLayer;
+using TalendMigration.Core.DataAccessLayer;
 
-Console.WriteLine($"{fileName}");
+// See https://aka.ms/new-console-template for more information
 
-var subs = migration.GetSubscriptions();
+using IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices((_, services) => {
+        services.AddTransient<IMigrationDAL, CiscoDAL>();
+        services.AddTransient<IMigrationDAL, SonicWallDAL>();
+        services.AddSingleton<IMigration, CiscoMigration>();
+        services.AddSingleton<IMigration, SonicWallMigration>();
+        services.AddTransient<CiscoDAL>();
+        services.AddTransient<SonicWallDAL>();
+        services.AddSingleton<CiscoMigration>();
+        services.AddSingleton<SonicWallMigration>();
+    })
+    .ConfigureLogging((hostContext, logger) => {
+        logger.SetMinimumLevel(LogLevel.Debug);
+        logger.AddSimpleConsole(options => options.IncludeScopes = true );
+    })
+    .Build();
 
-if (subs.Any())
-    migration.SaveSubscriptions(subs);
 
-Console.WriteLine($"Program ending! {subs.Count()} subscription(s)");
+var manager = Migration.Console.MigrationManager.Create(args);
+
+Console.WriteLine($"\nFile to process --> {manager.FileName}");
+manager.Execute();
+
+Console.WriteLine($"{manager.Subscriptions.Count()} subscription(s) found in {System.IO.Path.GetFileName(manager.FileName)}");
+Console.WriteLine("File json saved successfully");
+
+Console.WriteLine("\nProgram ending");

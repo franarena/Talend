@@ -1,4 +1,4 @@
-namespace TalendMigration.Models;
+namespace TalendMigration.Core.Models;
 public class SubscriptionsCollection<T>
 {
     public IEnumerable<T> Subscriptions { get; set; }

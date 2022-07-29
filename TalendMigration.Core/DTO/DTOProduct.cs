@@ -30,8 +30,8 @@ public class DTOProduct
             ProductName = invoice.ProductName,
             Quantity = $"{invoice.Quantity}",
             Currency = invoice.Currency,
-            Price = $"{invoice.Price:0.00}",
-            Cost = $"{invoice.Cost:0.00}",
+            Price = $"{invoice.Price:0.0000}",
+            Cost = $"{invoice.Cost:0.0000}",
             PriceAfterCredits = null,
             CostAfterCredits = null,
             CreditsApplicableAtRenewal = null
@@ -44,11 +44,11 @@ public class DTOProduct
         if (invoiceCisco != null)
         {
             objProduct.PriceAfterCredits = Decimal.TryParse(invoiceCisco.PriceAfterCredits, out decimal d)
-                ? d.ToString("0.00")
-                : "0.00";
+                ? d.ToString("0.0000")
+                : "0.0000";
             objProduct.CostAfterCredits = Decimal.TryParse(invoiceCisco.CostAfterCredits, out d)
-                ? d.ToString("0.00")
-                : "0.00";
+                ? d.ToString("0.0000")
+                : "0.0000";
             objProduct.CreditsApplicableAtRenewal = invoiceCisco.CreditsApplicableAtRenewal;
         }
 

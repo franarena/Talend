@@ -4,13 +4,15 @@ using TalendMigration.Core.DTO;
 using TalendMigration.Core.Models;
 
 namespace TalendMigration.Core.BusinessLayer;
-public class CiscoMigration : Migration
+public class SonicWallMigration : Migration
 {
     public Char ColumnSeparator { get; set; }
 
-    public CiscoMigration(IMigrationDAL dal) : base(dal)
+    public SonicWallMigration(IMigrationDAL dal) : base(dal)
     {
+        
     }
+
     public override IEnumerable<DTOSubscription> GetSubscriptions<T>(string migrationFile)
     {
         MigrationFile = migrationFile;
@@ -19,46 +21,32 @@ public class CiscoMigration : Migration
 
     public override IEnumerable<DTOSubscription> GetSubscriptions()
     {
-        //trace.Trace__BEGIN();
-        var subscriptions2 = new List<DTOSubscription>();
+        //trace.Trace__BEGIN(migrationFile);
+        var subscriptions = new List<DTOSubscription>();
+
         try
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
+            
+            var invoices = dal.RecuperaInvoices<Invoice>(MigrationFile, ColumnSeparator);
 
-            var invoices = dal?.RecuperaInvoices<InvoiceCisco>(MigrationFile, ColumnSeparator);
-
-/*
-            if (invoices.All(x => x.Bill_To == null))
-                trace.Trace__INFO("No BillTo information found, in all records!");
-            else if (invoices.Any(x => x.Bill_To == null))
-                trace.Trace__INFO("No BillTo information found, at least in one subscription");
-
-            if (invoices.All(x => string.IsNullOrEmpty(x.ResellerBCN)))
-                trace.Trace__INFO("No BCN information found, in all records!");
-            else if (invoices.Any(x => string.IsNullOrEmpty(x.ResellerBCN)))
-                trace.Trace__INFO("No BCN information found, at least in one subscription");
-                */
-
-            var inv_nodup = invoices?
+            var inv_nodup = invoices
                 .Where(x => x.Bill_To.HasValue)
                 .GroupBy(x => new { x.ResellerBCN, x.VendorSubscriptionID })
-                .Select(g => g.FirstOrDefault())
-                .ToList()!;
+                .Select(g => g.FirstOrDefault());
 
-            var products = invoices?
+            var products = invoices
                 .Where(x => x.Bill_To.HasValue)
                 .GroupBy(x => new { ResellerBCN = x.ResellerBCN?.ToString(), x.VendorSubscriptionID })
-                .Select(g => new { g.Key.ResellerBCN, g.Key.VendorSubscriptionID, Products = g.Select(x => (DTOProduct)x).ToList() })
-                .ToList()!;
+                .Select(g => new { g.Key.ResellerBCN, g.Key.VendorSubscriptionID, Products = g.Select(x => (DTOProduct)x).ToList() });
 
-            //NEW VERSION
             foreach (var invoice in inv_nodup)
-                subscriptions2.Add((DTOSubscription)invoice);
+                subscriptions.Add((DTOSubscription)invoice);
             foreach (var p in products)
             {
-                var invoice = subscriptions2
+                var invoice = subscriptions
                     .Where(s => s.Reseller_BCN == p.ResellerBCN
-                            && s.parameters!.Any(x => x.name == "vendor_subscription_id" && x.value == p.VendorSubscriptionID))
+                            && s.parameters.Any(x => x.name == "vendor_subscription_id" && x.value == p.VendorSubscriptionID))
                     .SingleOrDefault();
                 if (invoice != null)
                 {
@@ -70,7 +58,7 @@ public class CiscoMigration : Migration
                         .GroupBy(x => x.ProductMPN)
                         .Select(g => g.FirstOrDefault())
                         .ToList();
-                    invoice.products = invProducts!;
+                    invoice.products = invProducts;
                 }
             }
         }
@@ -78,6 +66,6 @@ public class CiscoMigration : Migration
         {
             //trace.Trace__END();
         }
-        return subscriptions2;
-    }    
+        return subscriptions;
+    }
 }
