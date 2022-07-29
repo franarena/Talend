@@ -1,3 +1,4 @@
+using TalendMigration.Core.DataAccessLayer;
 using TalendMigration.Core.BusinessLayer;
 using TalendMigration.Core.Models;
 using TalendMigration.Core.DTO;
@@ -7,13 +8,12 @@ internal sealed class MigrationManager
 {
     internal bool IsCisco { get; private set; }
     internal bool IsSonicWall { get; private set; }
-    internal string FileName { get; private set; } = string.Empty;
+    internal string FileName { get; private set; } = default!;
 
-    internal IEnumerable<DTOSubscription> Subscriptions { get; private set; }
+    internal IEnumerable<DTOSubscription> Subscriptions { get; private set; } = default!;
 
-    private IMigration migration;
-    private IMigrationDAL dal;
-
+    private IMigration migration = default!;
+    private IMigrationDAL dal = default!;
 
     private MigrationManager()
     {

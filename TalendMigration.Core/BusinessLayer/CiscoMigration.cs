@@ -43,13 +43,13 @@ public class CiscoMigration : Migration
                 .Where(x => x.Bill_To.HasValue)
                 .GroupBy(x => new { x.ResellerBCN, x.VendorSubscriptionID })
                 .Select(g => g.FirstOrDefault())
-                .ToList();
+                .ToList()!;
 
             var products = invoices?
                 .Where(x => x.Bill_To.HasValue)
                 .GroupBy(x => new { ResellerBCN = x.ResellerBCN?.ToString(), x.VendorSubscriptionID })
                 .Select(g => new { g.Key.ResellerBCN, g.Key.VendorSubscriptionID, Products = g.Select(x => (DTOProduct)x).ToList() })
-                .ToList();
+                .ToList()!;
 
             //NEW VERSION
             foreach (var invoice in inv_nodup)
@@ -58,7 +58,7 @@ public class CiscoMigration : Migration
             {
                 var invoice = subscriptions2
                     .Where(s => s.Reseller_BCN == p.ResellerBCN
-                            && s.parameters.Any(x => x.name == "vendor_subscription_id" && x.value == p.VendorSubscriptionID))
+                            && s.parameters!.Any(x => x.name == "vendor_subscription_id" && x.value == p.VendorSubscriptionID))
                     .SingleOrDefault();
                 if (invoice != null)
                 {
@@ -70,7 +70,7 @@ public class CiscoMigration : Migration
                         .GroupBy(x => x.ProductMPN)
                         .Select(g => g.FirstOrDefault())
                         .ToList();
-                    invoice.products = invProducts;
+                    invoice.products = invProducts!;
                 }
             }
         }
